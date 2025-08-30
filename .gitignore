@@ -1,0 +1,15 @@
+# Visual Studio workspace
+.vs/
+
+# Build output folders
+bin/
+obj/
+
+# Optional: user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Optional: SQLite database if you don't want to commit it
+*.db
