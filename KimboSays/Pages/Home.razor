@@ -1,0 +1,60 @@
+﻿@page "/"
+
+<PageTitle>KimboSays</PageTitle>
+
+<div class="container py-5">
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle table-striped-custom mb-0">
+            <thead class="table-header-gradient">
+                <tr>
+                    <th>Task</th>
+                    <th>Description</th>
+                    <th>Difficulty</th>
+                    <th>Date Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in requests)
+                {
+                    <tr>
+                        <td>@item.Task</td>
+                        <td>@item.Description</td>
+                        <td>
+                            <span class="@GetDifficultyBadgeClasses(item.Difficulty)">
+                                @item.Difficulty
+                            </span>
+                        </td>
+                        <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+    public class KimboRequest
+    {
+        public string Task { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Difficulty { get; set; } = string.Empty;
+        public DateTime DateAdded { get; set; }
+    }
+
+    private List<KimboRequest> requests = new()
+    {
+        new KimboRequest { Task = "Vacuum Living Room", Description = "Run vacuum over carpet and couch", Difficulty = "Easy", DateAdded = new DateTime(2025, 8, 25) },
+        new KimboRequest { Task = "Clean Kitchen", Description = "Wipe counters, mop floor, wash dishes", Difficulty = "Medium", DateAdded = new DateTime(2025, 8, 26) },
+        new KimboRequest { Task = "Scrub Bathroom", Description = "Scrub sink, toilet, shower tiles", Difficulty = "Hard", DateAdded = new DateTime(2025, 8, 27) }
+    };
+
+    private string GetDifficultyBadgeClasses(string difficulty) =>
+        difficulty switch
+        {
+            "Easy" => "px-2 py-1 text-xs rounded-full bg-green-100 text-green-700",
+            "Medium" => "px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700",
+            "Hard" => "px-2 py-1 text-xs rounded-full bg-red-100 text-red-700",
+            _ => "px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700"
+        };
+}
