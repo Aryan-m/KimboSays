@@ -1,10 +1,16 @@
 ﻿@page "/"
 
 @inject IApiSvc ApiService
+@inject IJSRuntime JS
 
 <PageTitle>KimboSays</PageTitle>
 
 <div class="container py-5">
+
+    <div class="mb-2">
+        <button class="rounded-circle btn-glossy bg-glossy-blue" @onclick="BeginNew">+</button>
+    </div>
+
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover align-middle table-striped-custom mb-0">
             <thead class="table-header-gradient">
@@ -17,6 +23,27 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- New Task Row appears as first row when addingNew -->
+                @if (addingNew)
+                {
+                    <tr>
+                        <td>
+                            <input class="form-control" @bind="newTask.Task" />
+                        </td>
+                        <td>
+                            <input class="form-control" @bind="newTask.Description" />
+                        </td>
+                        <td>
+                            <input class="form-control" @bind="newTask.Effort" />
+                        </td>
+                        <td></td>
+                        <td>
+                            <button class="rounded-circle btn-glossy bg-glossy-green me-1" @onclick="SaveNew">+</button>
+                            <button class="rounded-circle btn-glossy bg-glossy-grey" @onclick="CancelNew">~</button>
+                        </td>
+                    </tr>
+                }
+
                 @if (kimboTasks is null)
                 {
                     <tr>
@@ -41,8 +68,16 @@
                                 </td>
                                 <td></td>
                                 <td>
-                                    <button class="btn btn-sm btn-success me-1" @onclick:stopPropagation="true" @onclick="SaveEdit">Save</button>
-                                    <button class="btn btn-sm btn-secondary" @onclick:stopPropagation="true" @onclick="CancelEdit">Cancel</button>
+                                    <button class="rounded-circle btn-glossy bg-glossy-green me-1"
+                                            @onclick:stopPropagation="true"
+                                            @onclick="SaveEdit">
+                                        O
+                                    </button>
+                                    <button class="rounded-circle btn-glossy bg-glossy-grey"
+                                            @onclick:stopPropagation="true"
+                                            @onclick="CancelEdit">
+                                        ~
+                                    </button>
                                 </td>
                             }
                             else
@@ -51,7 +86,13 @@
                                 <td>@item.Description</td>
                                 <td>@item.Effort</td>
                                 <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
-                                <td></td>
+                                <td>
+                                    <button class="rounded-circle btn-glossy bg-glossy-red"
+                                            @onclick:stopPropagation="true"
+                                            @onclick="() => DeleteTask(item)">
+                                        X
+                                    </button>
+                                </td>
                             }
                         </tr>
                     }
@@ -64,31 +105,23 @@
 @code {
     private List<KimboTask>? kimboTasks;
 
-    private KimboTask? editTask;         // currently editing row
-    private KimboTask? editModel;        // copy for editing
+    private KimboTask? editTask;
+    private KimboTask? editModel;
+
+    private bool addingNew = false;
+    private KimboTask newTask = new();
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            kimboTasks = await ApiService.GetAllTasksAsync();
-        }
-        catch (HttpRequestException ex)
-        {
-            Console.Error.WriteLine("API call failed: " + ex.Message);
-        }
-        catch (System.Text.Json.JsonException ex)
-        {
-            Console.Error.WriteLine("Failed to parse JSON: " + ex.Message);
-        }
+        kimboTasks = await ApiService.GetAllTasksAsync();
     }
 
+    // Edit
     private void BeginEdit(KimboTask task)
     {
-        if (editTask != null) return; // only allow one edit at a time
+        if (editTask != null || addingNew) return;
 
         editTask = task;
-        // shallow copy so user edits don’t apply until Save
         editModel = new KimboTask
         {
             Id = task.Id,
@@ -103,12 +136,11 @@
     {
         if (editTask == null || editModel == null) return;
 
-        // send to API
         await ApiService.UpdateTaskAsync(editModel);
 
-        // update local list
         editTask.Task = editModel.Task;
         editTask.Description = editModel.Description;
+        editTask.Effort = editModel.Effort;
 
         editTask = null;
         editModel = null;
@@ -118,5 +150,37 @@
     {
         editTask = null;
         editModel = null;
+    }
+
+    // Add
+    private void BeginNew()
+    {
+        addingNew = true;
+        newTask = new KimboTask();
+    }
+
+    private async Task SaveNew()
+    {
+        var created = await ApiService.AddTaskAsync(newTask);
+
+        kimboTasks?.Insert(0, created); // insert at top
+        addingNew = false;
+        newTask = new KimboTask();
+    }
+
+    private void CancelNew()
+    {
+        addingNew = false;
+        newTask = new KimboTask();
+    }
+
+    private async Task DeleteTask(KimboTask task)
+    {
+        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Fosho Delete '{task.Task}'?");
+        if (confirmed)
+        {
+            await ApiService.DeleteTaskAsync(task.Id);
+            kimboTasks?.Remove(task);
+        }
     }
 }

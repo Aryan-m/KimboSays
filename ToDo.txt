@@ -1,0 +1,2 @@
+- Make buttons Glossy
+- API error handling with snackbar

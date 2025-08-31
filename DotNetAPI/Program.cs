@@ -78,6 +78,8 @@ namespace DotNetAPI
             // Create new task
             app.MapPost(EndPointURL, async (KimboTask task, IKimboTaskSvc svc) =>
             {
+                task.DateAdded = DateOnly.FromDateTime(DateTime.UtcNow);
+
                 await svc.AddTaskAsync(task);
                 return Results.Created($"{EndPointURL}/{task.Id}", task);
             });
