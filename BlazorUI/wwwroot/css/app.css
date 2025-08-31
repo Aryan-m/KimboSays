@@ -1,5 +1,5 @@
 html, body {
-    font-family: "Gill Sans MT", "Gill Sans", "Trebuchet MS", sans-serif;
+    font-family: Copperplate, Copperplate Gothic Light, fantasy;
 }
 
 body {
@@ -115,17 +115,8 @@ code {
 
 .table-header-gradient {
     background: linear-gradient(to bottom, #1F7A53, #0F2E1E);
-    color: #D8B8FF;
+    color: #dfc5ff;
     transition: all 0.3s ease-in-out;
-}
-
-/* When user hovers anywhere on the thead, all text changes color */
-.table-header-gradient:hover th {
-    color: #F0D8FF; /* slightly brighter light purple */
-}
-
-.table-header-gradient th:hover {
-    color: #F0D8FF; /* slightly brighter light purple on hover */
 }
 
 .table-header-gradient th {
@@ -133,7 +124,19 @@ code {
     padding: 0.5em 0.5em;
     font-size: 1.2rem; /* larger text size */
     font-weight: 600; /* semi-bold for emphasis */
+    position: relative;
 }
+
+    .table-header-gradient th::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0; /* stick to bottom */
+        height: 4px; /* shadow thickness */
+        box-shadow: 0px 4px 4px 0.5px rgb(161 121 255);
+        pointer-events: none; /* doesn’t interfere with clicking */
+    }
 
 /* When user hovers anywhere on the header */
 .table-header-gradient:hover th {

@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@inject IApiSvc ApiService
+
 <PageTitle>KimboSays</PageTitle>
 
 <div class="container py-5">
@@ -11,50 +13,110 @@
                     <th>Description</th>
                     <th>Difficulty</th>
                     <th>Date Added</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in requests)
+                @if (kimboTasks is null)
                 {
                     <tr>
-                        <td>@item.Task</td>
-                        <td>@item.Description</td>
-                        <td>
-                            <span class="@GetDifficultyBadgeClasses(item.Difficulty)">
-                                @item.Difficulty
-                            </span>
-                        </td>
-                        <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
+                        <td colspan="5" class="text-center">Loading...</td>
                     </tr>
+                }
+                else
+                {
+                    @foreach (var item in kimboTasks)
+                    {
+                        <tr @onclick="() => BeginEdit(item)" style="cursor: pointer;">
+                            @if (editTask == item)
+                            {
+                                <td>
+                                    <input class="form-control" @bind="editModel.Task" />
+                                </td>
+                                <td>
+                                    <input class="form-control" @bind="editModel.Description" />
+                                </td>
+                                <td>
+                                    <input class="form-control" @bind="editModel.Effort" />
+                                </td>
+                                <td></td>
+                                <td>
+                                    <button class="btn btn-sm btn-success me-1" @onclick:stopPropagation="true" @onclick="SaveEdit">Save</button>
+                                    <button class="btn btn-sm btn-secondary" @onclick:stopPropagation="true" @onclick="CancelEdit">Cancel</button>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>@item.Task</td>
+                                <td>@item.Description</td>
+                                <td>@item.Effort</td>
+                                <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
+                                <td></td>
+                            }
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
     </div>
 </div>
 
-
 @code {
-    public class KimboRequest
+    private List<KimboTask>? kimboTasks;
+
+    private KimboTask? editTask;         // currently editing row
+    private KimboTask? editModel;        // copy for editing
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Task { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string Difficulty { get; set; } = string.Empty;
-        public DateTime DateAdded { get; set; }
+        try
+        {
+            kimboTasks = await ApiService.GetAllTasksAsync();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.Error.WriteLine("API call failed: " + ex.Message);
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            Console.Error.WriteLine("Failed to parse JSON: " + ex.Message);
+        }
     }
 
-    private List<KimboRequest> requests = new()
+    private void BeginEdit(KimboTask task)
     {
-        new KimboRequest { Task = "Vacuum Living Room", Description = "Run vacuum over carpet and couch", Difficulty = "Easy", DateAdded = new DateTime(2025, 8, 25) },
-        new KimboRequest { Task = "Clean Kitchen", Description = "Wipe counters, mop floor, wash dishes", Difficulty = "Medium", DateAdded = new DateTime(2025, 8, 26) },
-        new KimboRequest { Task = "Scrub Bathroom", Description = "Scrub sink, toilet, shower tiles", Difficulty = "Hard", DateAdded = new DateTime(2025, 8, 27) }
-    };
+        if (editTask != null) return; // only allow one edit at a time
 
-    private string GetDifficultyBadgeClasses(string difficulty) =>
-        difficulty switch
+        editTask = task;
+        // shallow copy so user edits don’t apply until Save
+        editModel = new KimboTask
         {
-            "Easy" => "px-2 py-1 text-xs rounded-full bg-green-100 text-green-700",
-            "Medium" => "px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700",
-            "Hard" => "px-2 py-1 text-xs rounded-full bg-red-100 text-red-700",
-            _ => "px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700"
+            Id = task.Id,
+            Task = task.Task,
+            Description = task.Description,
+            Effort = task.Effort,
+            DateAdded = task.DateAdded
         };
+    }
+
+    private async Task SaveEdit()
+    {
+        if (editTask == null || editModel == null) return;
+
+        // send to API
+        await ApiService.UpdateTaskAsync(editModel);
+
+        // update local list
+        editTask.Task = editModel.Task;
+        editTask.Description = editModel.Description;
+
+        editTask = null;
+        editModel = null;
+    }
+
+    private void CancelEdit()
+    {
+        editTask = null;
+        editModel = null;
+    }
 }

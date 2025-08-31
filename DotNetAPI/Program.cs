@@ -26,10 +26,21 @@ namespace DotNetAPI
 
             builder.Services.AddAuthorization();
 
+            string UIBaseAddress = builder.Configuration["UIClient:BaseUrl"]!;
+            string CorsPolicyName = "AllowUIClient";
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicyName,
+                    builder => builder.WithOrigins(UIBaseAddress)
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod());
+            });
+
             var app = builder.Build();
 
             app.UseHttpsRedirection();
             app.UseAuthorization();
+            app.UseCors(CorsPolicyName);
 
             // Global Exception Handling
             app.UseExceptionHandler(errorApp =>
@@ -72,13 +83,19 @@ namespace DotNetAPI
             });
 
             // Update task
-            app.MapPut("{EndPointURL}/{id:int}", async (int id, KimboTask updatedTask, IKimboTaskSvc svc) =>
+            app.MapPut("{EndPointURL}", async (KimboTask updatedTask, IKimboTaskSvc svc) =>
             {
-                var existingTask = await svc.GetTaskByIdAsync(id);
+                var existingTask = await svc.GetTaskByIdAsync(updatedTask.Id);
                 if (existingTask is null) return Results.NotFound();
 
-                updatedTask.Id = id;
-                await svc.UpdateTaskAsync(updatedTask);
+                // Copy values from updatedTask into the tracked existingTask
+                existingTask.Task = updatedTask.Task;
+                existingTask.Description = updatedTask.Description;
+                existingTask.Effort = updatedTask.Effort;
+
+                // Save
+                await svc.UpdateTaskAsync(existingTask);
+
                 return Results.NoContent();
             });
 
@@ -91,7 +108,6 @@ namespace DotNetAPI
                 await svc.DeleteTaskAsync(id);
                 return Results.NoContent();
             });
-
 
             app.Run();
         }

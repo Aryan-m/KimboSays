@@ -1,27 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DataRepo.Models
+namespace BlazorUI.Models
 {
     public class KimboTask
     {
-        [Key]
         public int Id { get; set; }
-
-        [Required]
-        [MaxLength(50)]
-        [Column(TypeName = "TEXT")]
         public string Task { get; set; } = string.Empty;
-
-        [MaxLength(400)]
-        [Column(TypeName = "TEXT")]
         public string Description { get; set; } = string.Empty;
-
-        [MaxLength(10)]
-        [Column(TypeName = "TEXT")]
-        public string Effort { get; set; }  // small int, stored efficiently
-
-        [Column(TypeName = "DATE")]
+        public string Effort { get; set; } = string.Empty;
         public DateOnly DateAdded { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }
