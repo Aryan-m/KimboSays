@@ -2,6 +2,7 @@
 
 @inject IApiSvc ApiService
 @inject IJSRuntime JS
+@inject Blazored.Toast.Services.IToastService ToastService
 
 <PageTitle>KimboSays</PageTitle>
 
@@ -38,7 +39,7 @@
                         </td>
                         <td></td>
                         <td>
-                            <button class="rounded-circle btn-glossy bg-glossy-green me-1" @onclick="SaveNew">+</button>
+                            <button class="rounded-circle btn-glossy bg-glossy-green me-1" @onclick="AddNew">+</button>
                             <button class="rounded-circle btn-glossy bg-glossy-grey" @onclick="CancelNew">~</button>
                         </td>
                     </tr>
@@ -103,6 +104,9 @@
 </div>
 
 @code {
+    private const string SuccessMsg = "Done";
+    private const string ErrorMsg = "Something's f*cked up! Call Awy!";
+
     private List<KimboTask>? kimboTasks;
 
     private KimboTask? editTask;
@@ -113,10 +117,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        kimboTasks = await ApiService.GetAllTasksAsync();
+        await ExecuteSafeAsync(async () =>
+        {
+            kimboTasks = await ApiService.GetAllTasksAsync();
+        }, false);
     }
 
-    // Edit
     private void BeginEdit(KimboTask task)
     {
         if (editTask != null || addingNew) return;
@@ -132,39 +138,32 @@
         };
     }
 
-    private async Task SaveEdit()
-    {
-        if (editTask == null || editModel == null) return;
-
-        await ApiService.UpdateTaskAsync(editModel);
-
-        editTask.Task = editModel.Task;
-        editTask.Description = editModel.Description;
-        editTask.Effort = editModel.Effort;
-
-        editTask = null;
-        editModel = null;
-    }
-
     private void CancelEdit()
     {
         editTask = null;
         editModel = null;
     }
 
-    // Add
+    private async Task SaveEdit()
+    {
+        if (editTask == null || editModel == null) return;
+
+        await ExecuteSafeAsync(async () =>
+        {
+            await ApiService.UpdateTaskAsync(editModel);
+
+            editTask.Task = editModel.Task;
+            editTask.Description = editModel.Description;
+            editTask.Effort = editModel.Effort;
+
+            editTask = null;
+            editModel = null;
+        });
+    }
+
     private void BeginNew()
     {
         addingNew = true;
-        newTask = new KimboTask();
-    }
-
-    private async Task SaveNew()
-    {
-        var created = await ApiService.AddTaskAsync(newTask);
-
-        kimboTasks?.Insert(0, created); // insert at top
-        addingNew = false;
         newTask = new KimboTask();
     }
 
@@ -174,13 +173,48 @@
         newTask = new KimboTask();
     }
 
+    private async Task AddNew()
+    {
+        await ExecuteSafeAsync(async () =>
+        {
+            var created = await ApiService.AddTaskAsync(newTask);
+            if (created == null)
+                throw new Exception("Add New Failed!");
+
+            kimboTasks?.Insert(0, created);
+            addingNew = false;
+            newTask = new KimboTask();
+        });
+    }
+
     private async Task DeleteTask(KimboTask task)
     {
-        bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Fosho Delete '{task.Task}'?");
-        if (confirmed)
+        await ExecuteSafeAsync(async () =>
         {
+            bool confirmed = await JS.InvokeAsync<bool>("confirm", $"Fosho Delete '{task.Task}'?");
+            if (!confirmed) return;
+
             await ApiService.DeleteTaskAsync(task.Id);
             kimboTasks?.Remove(task);
+        });
+    }
+
+    private void ShowSuccess() => ToastService.ShowSuccess(SuccessMsg);
+    private void ShowError() => ToastService.ShowError(ErrorMsg);
+
+    // Executes a task with error handling and success/failure notifications
+    private async Task ExecuteSafeAsync(Func<Task> action, bool showMsgs = true)
+    {
+        try
+        {
+            await action();
+            if (showMsgs)
+                ShowSuccess();
+        }
+        catch
+        {
+            if (showMsgs)
+                ShowError();
         }
     }
 }
