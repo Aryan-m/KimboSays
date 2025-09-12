@@ -92,6 +92,7 @@ namespace DotNetAPI
                 if (existingTask is null) return Results.NotFound();
 
                 // Copy values from updatedTask into the tracked existingTask
+                existingTask.Priority = updatedTask.Priority;
                 existingTask.Task = updatedTask.Task;
                 existingTask.Description = updatedTask.Description;
                 existingTask.EffortId = updatedTask.EffortId;

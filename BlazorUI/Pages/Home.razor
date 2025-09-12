@@ -11,6 +11,7 @@
         <table class="table table-hover align-middle table-striped-custom mb-0">
             <thead class="table-header-gradient">
                 <tr>
+                    <th>Priority</th>
                     <th>Task</th>
                     <th>Description</th>
                     <th>Difficulty</th>
@@ -23,6 +24,9 @@
                 @if (addingNew)
                 {
                     <tr>
+                        <td>
+                            <InputNumber class="form-control" @bind-Value="newTask.Priority" />
+                        </td>
                         <td>
                             <input class="form-control" @bind="newTask.Task" />
                         </td>
@@ -64,6 +68,9 @@
                             @if (editTask == item)
                             {
                                 <td>
+                                    <InputNumber class="form-control" @bind-Value="editModel.Priority" />
+                                </td>
+                                <td>
                                     <input class="form-control" @bind="editModel.Task" />
                                 </td>
                                 <td>
@@ -96,6 +103,7 @@
                             }
                             else
                             {
+                                <td>@(item.Priority != 0 ? item.Priority.ToString() : "")</td>
                                 <td>@item.Task</td>
                                 <td>@item.Description</td>
                                 <td>@effortOptions?.Find(e => e.Id == item.EffortId)?.Text</td>
@@ -146,6 +154,7 @@
         editModel = new KimboTask
         {
             Id = task.Id,
+            Priority = task.Priority,
             Task = task.Task,
             Description = task.Description,
             EffortId = task.EffortId,
@@ -167,6 +176,7 @@
         {
             await ApiService.UpdateTaskAsync(editModel);
 
+            editTask.Priority = editModel.Priority;
             editTask.Task = editModel.Task;
             editTask.Description = editModel.Description;
             editTask.EffortId = editModel.EffortId;

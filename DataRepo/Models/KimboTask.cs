@@ -8,6 +8,8 @@ namespace DataRepo.Models
         [Key]
         public int Id { get; set; }
 
+        public int Priority { get; set; }
+
         [Required]
         [MaxLength(50)]
         [Column(TypeName = "TEXT")]

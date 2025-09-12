@@ -1,0 +1,4 @@
+﻿These are the commands related to migrations; run them in Nuget Package Manager Console:
+
+- To create a new migration: dotnet ef migrations add [Migration Name] --project DataRepo --startup-project DotNetAPI
+- To update database from new migration: dotnet ef database update --project DataRepo --startup-project DotNetAPI
