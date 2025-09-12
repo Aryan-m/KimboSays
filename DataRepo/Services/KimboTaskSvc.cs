@@ -12,8 +12,8 @@ namespace DataRepo.Services
             _context = context;
         }
 
-        public async Task<List<KimboTask>> GetAllTasksAsync() =>
-            await _context.KimboTasks.OrderBy(t => t.DateAdded).AsNoTracking().ToListAsync();
+        public async Task<IEnumerable<KimboTask>> GetAllTasksAsync() =>
+            await _context.KimboTasks.Include(t => t.Effort).OrderBy(t => t.DateAdded).AsNoTracking().ToListAsync();
 
         public async Task<KimboTask?> GetTaskByIdAsync(int id) =>
             await _context.KimboTasks.FindAsync(id);

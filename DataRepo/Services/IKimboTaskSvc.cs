@@ -6,7 +6,7 @@ namespace DataRepo.Services
     {
         Task AddTaskAsync(KimboTask task);
         Task DeleteTaskAsync(int id);
-        Task<List<KimboTask>> GetAllTasksAsync();
+        Task<IEnumerable<KimboTask>> GetAllTasksAsync();
         Task<KimboTask?> GetTaskByIdAsync(int id);
         Task UpdateTaskAsync(KimboTask task);
     }

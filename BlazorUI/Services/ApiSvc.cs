@@ -6,7 +6,8 @@ namespace BlazorUI.Services
     public class ApiSvc : IApiSvc
     {
         private readonly HttpClient _httpClient;
-        private const string EndPointUrl = "kimbotasks";
+        private const string TaskEndPointUrl = "kimbotasks";
+        private const string EffortEndPointUrl = "effortoptions";
 
         public ApiSvc(HttpClient httpClient)
         {
@@ -15,17 +16,17 @@ namespace BlazorUI.Services
 
         public async Task<List<KimboTask>> GetAllTasksAsync()
         {
-            return await _httpClient.GetFromJsonAsync<List<KimboTask>>(EndPointUrl);
+            return await _httpClient.GetFromJsonAsync<List<KimboTask>>(TaskEndPointUrl);
         }
 
         public async Task<KimboTask> GetTaskByIdAsync(int id)
         {
-            return await _httpClient.GetFromJsonAsync<KimboTask>($"{EndPointUrl}/{id}");
+            return await _httpClient.GetFromJsonAsync<KimboTask>($"{TaskEndPointUrl}/{id}");
         }
 
         public async Task<KimboTask> AddTaskAsync(KimboTask newTask)
         {
-            var response = await _httpClient.PostAsJsonAsync(EndPointUrl, newTask);
+            var response = await _httpClient.PostAsJsonAsync(TaskEndPointUrl, newTask);
             response.EnsureSuccessStatusCode();
 
             return await response.Content.ReadFromJsonAsync<KimboTask>();
@@ -33,14 +34,19 @@ namespace BlazorUI.Services
 
         public async Task UpdateTaskAsync(KimboTask updatedTask)
         {
-            var response = await _httpClient.PutAsJsonAsync($"{EndPointUrl}", updatedTask);
+            var response = await _httpClient.PutAsJsonAsync($"{TaskEndPointUrl}", updatedTask);
             response.EnsureSuccessStatusCode();
         }
 
         public async Task DeleteTaskAsync(int id)
         {
-            var response = await _httpClient.DeleteAsync($"{EndPointUrl}/{id}");
+            var response = await _httpClient.DeleteAsync($"{TaskEndPointUrl}/{id}");
             response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<List<TaskEffort>> GetEffortOptionsAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<List<TaskEffort>>(EffortEndPointUrl);
         }
     }
 }

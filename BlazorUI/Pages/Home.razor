@@ -30,7 +30,17 @@
                             <input class="form-control" @bind="newTask.Description" />
                         </td>
                         <td>
-                            <input class="form-control" @bind="newTask.Effort" />
+                            <select class="form-select"
+                                    @bind="newTask.EffortId">
+                                <option value="" disabled selected>-- select --</option>
+                                @if (effortOptions != null)
+                                {
+                                    @foreach (var e in effortOptions)
+                                    {
+                                        <option value="@e.Id">@e.Text</option>
+                                    }
+                                }
+                            </select>
                         </td>
                         <td></td>
                         <td>
@@ -60,7 +70,15 @@
                                     <input class="form-control" @bind="editModel.Description" />
                                 </td>
                                 <td>
-                                    <input class="form-control" @bind="editModel.Effort" />
+                                    <select class="form-select" @bind="editModel.EffortId">
+                                        @if (effortOptions != null)
+                                        {
+                                            @foreach (var e in effortOptions)
+                                            {
+                                                <option value="@e.Id">@e.Text</option>
+                                            }
+                                        }
+                                    </select>
                                 </td>
                                 <td></td>
                                 <td>
@@ -80,7 +98,7 @@
                             {
                                 <td>@item.Task</td>
                                 <td>@item.Description</td>
-                                <td>@item.Effort</td>
+                                <td>@effortOptions?.Find(e => e.Id == item.EffortId)?.Text</td>
                                 <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
                                 <td>
                                     <button class="rounded-circle btn-glossy bg-glossy-red"
@@ -103,6 +121,7 @@
     private const string ErrorMsg = "Something's f*cked up! Call Awy!";
 
     private List<KimboTask>? kimboTasks;
+    private List<TaskEffort>? effortOptions;
 
     private KimboTask? editTask;
     private KimboTask? editModel;
@@ -114,6 +133,7 @@
     {
         await ExecuteSafeAsync(async () =>
         {
+            effortOptions = await ApiService.GetEffortOptionsAsync();
             kimboTasks = await ApiService.GetAllTasksAsync();
         }, false);
     }
@@ -128,7 +148,7 @@
             Id = task.Id,
             Task = task.Task,
             Description = task.Description,
-            Effort = task.Effort,
+            EffortId = task.EffortId,
             DateAdded = task.DateAdded
         };
     }
@@ -149,7 +169,7 @@
 
             editTask.Task = editModel.Task;
             editTask.Description = editModel.Description;
-            editTask.Effort = editModel.Effort;
+            editTask.EffortId = editModel.EffortId;
 
             editTask = null;
             editModel = null;

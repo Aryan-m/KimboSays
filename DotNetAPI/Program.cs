@@ -23,6 +23,7 @@ namespace DotNetAPI
                 options.UseSqlite(connectionString));
 
             builder.Services.AddScoped<IKimboTaskSvc, KimboTaskSvc>();
+            builder.Services.AddScoped<ITaskEffortSvc, TaskEffortSvc>();
 
             builder.Services.AddAuthorization();
 
@@ -59,10 +60,10 @@ namespace DotNetAPI
 
             // --- Minimal API Endpoints ---
 
-            string EndPointURL = "/kimbotasks";
+            string TaskEndPointURL = "/kimbotasks";
 
             // Get all tasks
-            app.MapGet(EndPointURL, async (IKimboTaskSvc svc) =>
+            app.MapGet(TaskEndPointURL, async (IKimboTaskSvc svc) =>
             {
                 var tasks = await svc.GetAllTasksAsync();
                 return Results.Ok(tasks);
@@ -76,12 +77,12 @@ namespace DotNetAPI
             });
 
             // Create new task
-            app.MapPost(EndPointURL, async (KimboTask task, IKimboTaskSvc svc) =>
+            app.MapPost(TaskEndPointURL, async (KimboTask task, IKimboTaskSvc svc) =>
             {
                 task.DateAdded = DateOnly.FromDateTime(DateTime.UtcNow);
 
                 await svc.AddTaskAsync(task);
-                return Results.Created($"{EndPointURL}/{task.Id}", task);
+                return Results.Created($"{TaskEndPointURL}/{task.Id}", task);
             });
 
             // Update task
@@ -93,7 +94,7 @@ namespace DotNetAPI
                 // Copy values from updatedTask into the tracked existingTask
                 existingTask.Task = updatedTask.Task;
                 existingTask.Description = updatedTask.Description;
-                existingTask.Effort = updatedTask.Effort;
+                existingTask.EffortId = updatedTask.EffortId;
 
                 // Save
                 await svc.UpdateTaskAsync(existingTask);
@@ -109,6 +110,14 @@ namespace DotNetAPI
 
                 await svc.DeleteTaskAsync(id);
                 return Results.NoContent();
+            });
+
+            string EffortEndPointURL = "/effortoptions";
+
+            app.MapGet(EffortEndPointURL, async (ITaskEffortSvc svc) =>
+            {
+                var effortOptions = await svc.GetAll();
+                return Results.Ok(effortOptions);
             });
 
             app.Run();

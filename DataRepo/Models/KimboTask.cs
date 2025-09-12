@@ -17,9 +17,9 @@ namespace DataRepo.Models
         [Column(TypeName = "TEXT")]
         public string Description { get; set; } = string.Empty;
 
-        [MaxLength(10)]
-        [Column(TypeName = "TEXT")]
-        public string Effort { get; set; }  // small int, stored efficiently
+        [Required]
+        public int EffortId { get; set; }
+        public virtual TaskEffort? Effort { get; set; }
 
         [Column(TypeName = "DATE")]
         public DateOnly DateAdded { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);

@@ -9,5 +9,6 @@ namespace DataRepo.Models
             : base(options) { }
 
         public DbSet<KimboTask> KimboTasks { get; set; }
+        public DbSet<TaskEffort> TaskEfforts { get; set; }
     }
 }
