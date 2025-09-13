@@ -13,14 +13,16 @@ namespace DotNetAPI
             // Get connection string from config
             var connectionString = builder.Configuration.GetConnectionString("KimboTasksDb");
 
-            // Ensure folder exists
-            var dbFolder = Path.GetDirectoryName(connectionString!.Replace("Data Source=", "").Trim());
-            if (!Directory.Exists(dbFolder))
-                throw new Exception("Specified Database folder from the connection string does not exist.");
-
             // Register DbContext
             builder.Services.AddDbContext<KimboTasksDbContext>(options =>
-                options.UseSqlite(connectionString));
+                options.UseSqlServer(connectionString,
+                    sqlOptions => sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(10),
+                        errorNumbersToAdd: null
+                    )
+                )
+            );
 
             builder.Services.AddScoped<IKimboTaskSvc, KimboTaskSvc>();
             builder.Services.AddScoped<ITaskEffortSvc, TaskEffortSvc>();
