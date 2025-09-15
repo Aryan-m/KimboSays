@@ -96,6 +96,8 @@ a, .btn-link {
 .loading-progress-text {
     position: absolute;
     text-align: center;
+    color: #F0D8FF; /* slightly brighter light purple */
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.7); /* subtle glow on hover */
     font-weight: bold;
     inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
 }
@@ -125,6 +127,7 @@ code {
     font-size: 1.2rem; /* larger text size */
     font-weight: 600; /* semi-bold for emphasis */
     position: relative;
+    text-align: center;
 }
 
     .table-header-gradient th::after {
@@ -137,6 +140,10 @@ code {
         box-shadow: 0px 4px 4px 0.5px rgb(161 121 255);
         pointer-events: none; /* doesn’t interfere with clicking */
     }
+
+td {
+    text-align: center;
+}
 
 /* When user hovers anywhere on the header */
 .table-header-gradient:hover th {
@@ -232,4 +239,16 @@ code {
 
 .bg-glossy-grey {
     background-color: grey;
+}
+
+input.adjust-width-on-phones {
+    min-width: 200px;
+}
+
+textarea.adjust-width-on-phones {
+    min-width: 270px;
+}
+
+select.adjust-width-on-phones {
+    min-width: 120px;
 }

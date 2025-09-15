@@ -11,12 +11,12 @@
         <table class="table table-hover align-middle table-striped-custom mb-0">
             <thead class="table-header-gradient">
                 <tr>
+                    <th><div><button class="rounded-circle btn-glossy bg-glossy-blue" @onclick="BeginNew">+</button></div></th>
                     <th>Priority</th>
                     <th>Task</th>
                     <th>Description</th>
-                    <th>Difficulty</th>
+                    <th>Effort</th>
                     <th>Date Added</th>
-                    <th><div><button class="rounded-circle btn-glossy bg-glossy-blue" @onclick="BeginNew">+</button></div></th>
                 </tr>
             </thead>
             <tbody>
@@ -25,16 +25,20 @@
                 {
                     <tr>
                         <td>
+                            <button class="rounded-circle btn-glossy bg-glossy-green me-1" @onclick="AddNew">+</button>
+                            <button class="rounded-circle btn-glossy bg-glossy-grey" @onclick="CancelNew">x</button>
+                        </td>
+                        <td>
                             <InputNumber class="form-control" @bind-Value="newTask.Priority" />
                         </td>
                         <td>
-                            <input class="form-control" @bind="newTask.Task" />
+                            <input class="form-control adjust-width-on-phones" @bind="newTask.Task" />
                         </td>
                         <td>
-                            <input class="form-control" @bind="newTask.Description" />
+                            <textarea class="form-control adjust-width-on-phones" @bind="newTask.Description" />
                         </td>
                         <td>
-                            <select class="form-select"
+                            <select class="form-select adjust-width-on-phones"
                                     @bind="newTask.EffortId">
                                 <option value="" disabled selected>-- select --</option>
                                 @if (effortOptions != null)
@@ -46,11 +50,7 @@
                                 }
                             </select>
                         </td>
-                        <td></td>
-                        <td>
-                            <button class="rounded-circle btn-glossy bg-glossy-green me-1" @onclick="AddNew">+</button>
-                            <button class="rounded-circle btn-glossy bg-glossy-grey" @onclick="CancelNew">x</button>
-                        </td>
+                        <td></td>                        
                     </tr>
                 }
 
@@ -68,27 +68,6 @@
                             @if (editTask == item)
                             {
                                 <td>
-                                    <InputNumber class="form-control" @bind-Value="editModel.Priority" />
-                                </td>
-                                <td>
-                                    <input class="form-control" @bind="editModel.Task" />
-                                </td>
-                                <td>
-                                    <input class="form-control" @bind="editModel.Description" />
-                                </td>
-                                <td>
-                                    <select class="form-select" @bind="editModel.EffortId">
-                                        @if (effortOptions != null)
-                                        {
-                                            @foreach (var e in effortOptions)
-                                            {
-                                                <option value="@e.Id">@e.Text</option>
-                                            }
-                                        }
-                                    </select>
-                                </td>
-                                <td></td>
-                                <td>
                                     <button class="rounded-circle btn-glossy bg-glossy-green me-1"
                                             @onclick:stopPropagation="true"
                                             @onclick="SaveEdit">
@@ -100,14 +79,30 @@
                                         X
                                     </button>
                                 </td>
+                                <td>
+                                    <InputNumber class="form-control" @bind-Value="editModel.Priority" />
+                                </td>
+                                <td>
+                                    <input class="form-control adjust-width-on-phones" @bind="editModel.Task" />
+                                </td>
+                                <td>
+                                    <textarea class="form-control adjust-width-on-phones" @bind="editModel.Description" />
+                                </td>
+                                <td>
+                                    <select class="form-select adjust-width-on-phones" @bind="editModel.EffortId">
+                                        @if (effortOptions != null)
+                                        {
+                                            @foreach (var e in effortOptions)
+                                            {
+                                                <option value="@e.Id">@e.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </td>
+                                <td></td>
                             }
                             else
                             {
-                                <td>@(item.Priority != 0 ? item.Priority.ToString() : "")</td>
-                                <td>@item.Task</td>
-                                <td>@item.Description</td>
-                                <td>@effortOptions?.Find(e => e.Id == item.EffortId)?.Text</td>
-                                <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
                                 <td>
                                     <button class="rounded-circle btn-glossy bg-glossy-red"
                                             @onclick:stopPropagation="true"
@@ -115,6 +110,11 @@
                                         X
                                     </button>
                                 </td>
+                                <td>@(item.Priority != 0 ? item.Priority.ToString() : "")</td>
+                                <td>@item.Task</td>
+                                <td>@item.Description</td>
+                                <td>@effortOptions?.Find(e => e.Id == item.EffortId)?.Text</td>
+                                <td>@item.DateAdded.ToString("MMM dd, yyyy")</td>
                             }
                         </tr>
                     }
