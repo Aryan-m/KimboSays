@@ -13,10 +13,10 @@
                 <tr>
                     <th><div><button class="rounded-circle btn-glossy bg-glossy-blue" @onclick="BeginNew">+</button></div></th>
                     <th>Priority</th>
-                    <th>Task</th>
-                    <th>Description</th>
-                    <th>Effort</th>
-                    <th>Date Added</th>
+                    <th style="min-width: 200px;">Task</th>
+                    <th style="min-width: 270px;">Description</th>
+                    <th style="min-width: 120px;">Effort</th>
+                    <th style="min-width: 120px;">Date Added</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,13 +32,13 @@
                             <InputNumber class="form-control" @bind-Value="newTask.Priority" />
                         </td>
                         <td>
-                            <input class="form-control adjust-width-on-phones" @bind="newTask.Task" />
+                            <input class="form-control" @bind="newTask.Task" />
                         </td>
                         <td>
-                            <textarea class="form-control adjust-width-on-phones" @bind="newTask.Description" />
+                            <textarea class="form-control" @bind="newTask.Description" />
                         </td>
                         <td>
-                            <select class="form-select adjust-width-on-phones"
+                            <select class="form-select"
                                     @bind="newTask.EffortId">
                                 <option value="" disabled selected>-- select --</option>
                                 @if (effortOptions != null)
@@ -83,13 +83,13 @@
                                     <InputNumber class="form-control" @bind-Value="editModel.Priority" />
                                 </td>
                                 <td>
-                                    <input class="form-control adjust-width-on-phones" @bind="editModel.Task" />
+                                    <input class="form-control" @bind="editModel.Task" />
                                 </td>
                                 <td>
-                                    <textarea class="form-control adjust-width-on-phones" @bind="editModel.Description" />
+                                    <textarea class="form-control" @bind="editModel.Description" />
                                 </td>
                                 <td>
-                                    <select class="form-select adjust-width-on-phones" @bind="editModel.EffortId">
+                                    <select class="form-select" @bind="editModel.EffortId">
                                         @if (effortOptions != null)
                                         {
                                             @foreach (var e in effortOptions)

@@ -81,14 +81,14 @@ a, .btn-link {
 
     .loading-progress circle {
         fill: none;
-        stroke: #e0e0e0;
+        stroke: #00563B;
         stroke-width: 0.6rem;
         transform-origin: 50% 50%;
         transform: rotate(-90deg);
     }
 
         .loading-progress circle:last-child {
-            stroke: #1b6ec2;
+            stroke: rgb(161 121 255);
             stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
             transition: stroke-dasharray 0.05s ease-in-out;
         }
@@ -96,7 +96,7 @@ a, .btn-link {
 .loading-progress-text {
     position: absolute;
     text-align: center;
-    color: #F0D8FF; /* slightly brighter light purple */
+    color: #F0D8FF;
     text-shadow: 0 0 6px rgba(255, 255, 255, 0.7); /* subtle glow on hover */
     font-weight: bold;
     inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
@@ -118,6 +118,7 @@ code {
 .table-header-gradient {
     background: linear-gradient(to bottom, #1F7A53, #0F2E1E);
     color: #dfc5ff;
+    border: none;
     transition: all 0.3s ease-in-out;
 }
 
@@ -239,16 +240,4 @@ td {
 
 .bg-glossy-grey {
     background-color: grey;
-}
-
-input.adjust-width-on-phones {
-    min-width: 200px;
-}
-
-textarea.adjust-width-on-phones {
-    min-width: 270px;
-}
-
-select.adjust-width-on-phones {
-    min-width: 120px;
 }
