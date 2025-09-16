@@ -241,3 +241,8 @@ td {
 .bg-glossy-grey {
     background-color: grey;
 }
+
+.bright-glowy-text {
+    color: #66ffbb;
+    text-shadow: 0 0 7px rgb(0 217 63);
+}

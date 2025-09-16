@@ -7,6 +7,8 @@
 <PageTitle>KimboSays</PageTitle>
 
 <div class="container py-5">
+    <h3 class="bright-glowy-text mb-3">Hi @CurrentNickname</h3>
+
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover align-middle table-striped-custom mb-0">
             <thead class="table-header-gradient">
@@ -57,7 +59,7 @@
                 @if (kimboTasks is null)
                 {
                     <tr>
-                        <td colspan="6" class="text-center">Loading...</td>
+                        <td class="text-start" colspan="6">Loading...</td>
                     </tr>
                 }
                 else
@@ -128,6 +130,24 @@
     private const string SuccessMsg = "Done";
     private const string ErrorMsg = "Something's f*cked up! Call Awy!";
 
+    private readonly List<string> Nicknames = new()
+    {
+        "Cutiepie",
+        "Koot",
+        "Hun",
+        "Honey",
+        "Bunny",
+        "Baby",
+        "Babe",
+        "Sugar",
+        "Cutie",
+        "Sweetie",
+        "vv"
+    };
+
+    private string CurrentNickname = string.Empty;
+    private readonly Random _random = new();
+
     private List<KimboTask>? kimboTasks;
     private List<TaskEffort>? effortOptions;
 
@@ -141,6 +161,7 @@
     {
         await ExecuteSafeAsync(async () =>
         {
+            PickRandomNickname();
             effortOptions = await ApiService.GetEffortOptionsAsync();
             kimboTasks = await ApiService.GetAllTasksAsync();
         }, false);
@@ -246,5 +267,11 @@
             if (showMsgs)
                 ShowError();
         }
+    }
+
+    private void PickRandomNickname()
+    {
+        int index = _random.Next(Nicknames.Count);
+        CurrentNickname = Nicknames[index];
     }
 }
