@@ -246,3 +246,14 @@ td {
     color: #66ffbb;
     text-shadow: 0 0 7px rgb(0 217 63);
 }
+
+.spinner-border {
+    color: #27ceff;
+    border-top-color: #27ceff;
+    box-shadow: 0 0 10px 4px #ff6cf6;
+    background: #3d004b;
+}
+
+.loading-row {
+    background: #140018 !important;
+}

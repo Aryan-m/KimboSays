@@ -13,7 +13,11 @@
         <table class="table table-hover align-middle table-striped-custom mb-0">
             <thead class="table-header-gradient">
                 <tr>
-                    <th><div><button class="rounded-circle btn-glossy bg-glossy-blue" @onclick="BeginNew">+</button></div></th>
+                    <th>
+                        @if (loading == false) {
+                            <button class="rounded-circle btn-glossy bg-glossy-blue" @onclick="BeginNew">+</button>
+                        }
+                    </th>
                     <th>Priority</th>
                     <th style="min-width: 200px;">Task</th>
                     <th style="min-width: 270px;">Description</th>
@@ -59,7 +63,11 @@
                 @if (kimboTasks is null)
                 {
                     <tr>
-                        <td class="text-start" colspan="6">Loading...</td>
+                        <td class="text-start loading-row" colspan="6">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </td>
                     </tr>
                 }
                 else
@@ -142,11 +150,14 @@
         "Sugar",
         "Cutie",
         "Sweetie",
-        "vv"
+        "vv",
+        "Mouse"
     };
 
     private string CurrentNickname = string.Empty;
     private readonly Random _random = new();
+
+    private bool loading = true;
 
     private List<KimboTask>? kimboTasks;
     private List<TaskEffort>? effortOptions;
@@ -161,9 +172,11 @@
     {
         await ExecuteSafeAsync(async () =>
         {
+            loading = true;
             PickRandomNickname();
             effortOptions = await ApiService.GetEffortOptionsAsync();
             kimboTasks = await ApiService.GetAllTasksAsync();
+            loading = false;
         }, false);
     }
 
